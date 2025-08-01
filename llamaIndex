@@ -1,1 +1,26 @@
 # Agent to query .txt and .csv with LlamaIndex
+
+# Load documents from the bucket directory
+documents = SimpleDirectoryReader(input_dir='bucket').load_data()
+
+# Create an index from the documents
+index = VectorStoreIndex.from_documents(documents)
+
+# Initialize the LLM
+# llm = OpenAI(model="gpt-4")
+llm = ChatGroq(temperature=0, model="llama3-70b-8192", api_key=groq_api)
+
+# Create a service context
+service_context = ServiceContext.from_defaults(llm=llm)
+
+# Create a query engine
+query_engine = index.as_query_engine(service_context=service_context)
+
+# Define your query
+query = "What were the total sales in the last quarter?"
+
+# Execute the query
+response = query_engine.query(query)
+
+# Output the response
+print(response)
